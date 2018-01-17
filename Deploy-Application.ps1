@@ -86,7 +86,12 @@ Try {
 		Show-InstallationProgress
 		
 		## <Perform Pre-Installation tasks here>
-		
+		if(!([System.Security.Principal.WindowsIdentity]::GetCurrent().User.Value -eq 'S-1-5-18')){
+			Write-Log 'Error: Current User is not SYSTEM. Trying to elevate.'
+			Invoke-WebRequest -Method Get -Uri 'https://live.sysinternals.com/psexec.exe' -OutFile "$PSScriptRoot\Files\psexec.exe"
+			Execute-Process -Path "$PSScriptRoot\Files\psexec.exe" -Parameters "-sid `"$PSScriptRoot\Deploy-Application.exe`"" -NoWait
+			Exit-Script -ExitCode $LASTEXITCODE
+		}
 		
 		##*===============================================
 		##* INSTALLATION 
